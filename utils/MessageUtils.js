@@ -24,9 +24,9 @@ export function createTextMessage(text) {
         id: getNextid(), 
         text,
     };
-}
+} 
 
-export function createimageMessage(uri) {
+export function createImageMessage(uri) {
     return {
         type: 'image', 
         id: getNextid(), 
