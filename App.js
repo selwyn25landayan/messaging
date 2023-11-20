@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, ImageBackground } from 'react-native';
+import { StyleSheet, View, ImageBackground, Image, Alert, TouchableHighlight, BackHandler } from 'react-native';
 import Status from './components/Status';
 import MessageList from './components/Messagelist'; // Ensure the correct import path
 import { createImageMessage, createLocationMessage, createTextMessage } from './utils/MessageUtils';
@@ -15,9 +15,81 @@ export default class App extends React.Component {
         longitude: -122.4324,
       })
     ],
+    fullscreenImageId: null,
   };
 
-  handlePressMessage = () => {}
+  dismissFullscreenImage = () => {
+    this.setState({ fullscreenImageId: null })
+  };
+
+  renderFullscreenImage = () => {
+    const { messages, fullscreenImageId } = this.state;
+    if (!fullscreenImageId) return null;
+  
+    const image = messages.find(message => message.id === fullscreenImageId);
+    if (!image) return null;
+  
+    const { uri } = image;
+    return (
+      <TouchableHighlight
+        style={styles.fullscreenOverlay}
+        onPress={this.dismissFullscreenImage}
+        underlayColor="transparent"
+      >
+        <Image style={styles.fullscreenImage} source={{ uri }} resizeMode="contain" />
+      </TouchableHighlight>
+    );
+  };
+  
+  handlePressMessage = ({ id, type }) => {
+    switch (type) {
+      case 'text':
+        Alert.alert(
+          'Delete message?',
+          'Are you sure you want to permanently delete this message?',
+          [
+            { 
+              text: 'Cancel', 
+              style: 'cancel' 
+            },
+            { 
+              text: 'Delete',
+              style: 'destructive',
+              onPress: () => this.handleDeleteMessage(item.id)
+            },
+          ]
+        );
+        break;
+      
+      case 'image':
+        this.setState({ fullscreenImageId: id });
+        break;
+      
+      default:
+        break;
+    }
+  };
+  
+  handleDeleteMessage = (id) => {
+    this.setState((state) => ({
+      messages: state.messages.filter(message => message.id !== id),
+    }));
+  };
+
+  componentDidMount() {
+    this.subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+      const { fullscreenImageId } = this.state;
+      if (fullscreenImageId) {
+        this.dismissFullscreenImage();
+        return true;
+      }
+      return false;
+    });
+  }
+
+  componentWillUnmount() {
+    this.subscription.remove();
+  }
 
   render() {
     return (
@@ -27,6 +99,7 @@ export default class App extends React.Component {
       >
         <View style={styles.innerContainer}>
           <Status />
+          {this.renderFullscreenImage()}
           <MessageList messages={this.state.messages} onPressMessage={this.handlePressMessage} />
         </View>
       </ImageBackground>
@@ -57,5 +130,22 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: 'rgba(0,0,0,0.04)',
     backgroundColor: 'white'
+  },
+  fullscreenOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'black',
+    zIndex: 1000, // Ensure it covers other components
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  fullscreenImage: {
+    flex: 1,
+    resizeMode: 'contain',
+    width: '100%',
+    height: '100%',
   },
 });

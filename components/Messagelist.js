@@ -22,11 +22,13 @@ export default class MessageList extends React.Component {
         switch (item.type) {
             case 'text': return(
                 <View style={styles.messageRow}>
-                    <View style={styles.messageBubble} onTouchStart={() => onPressMessage(item)}> 
-                        <Text style={styles.text}>{item.text}</Text>
+                  <TouchableHighlight onPress={() => onPressMessage(item)}>
+                    <View style={styles.messageBubble}> 
+                      <Text style={styles.text}>{item.text}</Text>
                     </View>
+                  </TouchableHighlight>
                 </View>
-            );
+              );
 
             case 'image':
                 return (
