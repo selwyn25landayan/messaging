@@ -86,7 +86,7 @@ export default class MessageList extends React.Component {
 const styles = StyleSheet.create({ 
     container: {
         flex: 1,
-        overflow: 'visible', //Prevents clipping on resize!
+        overflow: 'visible', 
     },
     contentContainer: {
         flexGrow: 1,
@@ -106,22 +106,22 @@ const styles = StyleSheet.create({
     },
     text: {
         color: 'white', 
-        fontSize: 16, 
+        fontSize: 20, 
     },
     image: {
-        width: 120,
-        height: 120, 
+        width: 200,
+        height: 200, 
         borderRadius: 10, 
     },
     map: {
-        width: 200,
-        height: 150,
+        width: 250,
+        height: 250,
         borderRadius: 10,
         borderWidth: 1,
         borderColor: '#ddd',
     },
     locationText: {
-        fontSize: 16,
+        fontSize: 25,
         color: 'gray',
         padding: 10,
         textAlign: 'center',
